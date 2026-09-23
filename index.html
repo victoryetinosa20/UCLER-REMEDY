@@ -1051,17 +1051,37 @@ src="https://www.facebook.com/tr?id=1398094341870501&ev=PageView&noscript=1"
     <script>
   const triggerSection = document.getElementById("cta-trigger");
   const stickyCTA = document.getElementById("sticky-cta");
-  let sectionInView = false; // Tracks if the target section is currently visible
+  let hiddenForever = false; // Flag to permanently hide the CTA
 
-  // Observe the target section to hide the CTA when the user reaches it
+  // Function to check scroll position
+  function handleScroll() {
+    // If it has been hidden forever, stop checking scroll entirely
+    if (hiddenForever) return;
+
+    const scrollDistance = document.documentElement.scrollHeight - window.innerHeight;
+    const thirtyFivePercent = scrollDistance * 0.35;
+
+    // Show CTA if scrolled past 35%
+    if (window.scrollY > thirtyFivePercent) {
+      stickyCTA.classList.add("show");
+    } else {
+      stickyCTA.classList.remove("show");
+    }
+  }
+
+  // Observe the target section
   const observer = new IntersectionObserver(
-    (entries) => {
+    (entries, observer) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          sectionInView = true; // User reached the section
+          hiddenForever = true; // Permanently mark as hidden
           stickyCTA.classList.remove("show"); // Hide the CTA
-        } else {
-          sectionInView = false; // User left the section
+          
+          // Stop observing the section
+          observer.disconnect(); 
+          
+          // Remove the scroll listener completely so it never shows again
+          window.removeEventListener('scroll', handleScroll);
         }
       });
     },
@@ -1071,25 +1091,9 @@ src="https://www.facebook.com/tr?id=1398094341870501&ev=PageView&noscript=1"
   );
 
   observer.observe(triggerSection);
-
-  // Check scroll position to show the CTA at 35% of the page
-  function handleScroll() {
-    // Calculate total scrollable distance
-    const scrollDistance = document.documentElement.scrollHeight - window.innerHeight;
-    // Find 35% of that distance
-    const thirtyFivePercent = scrollDistance * 0.35;
-
-    // Show CTA if scrolled past 35% AND the target section is not in view
-    if (window.scrollY > thirtyFivePercent && !sectionInView) {
-      stickyCTA.classList.add("show");
-    } else {
-      stickyCTA.classList.remove("show");
-    }
-  }
-
-  // Add scroll event listener
+  
+  // Listen for scroll and run once on load
   window.addEventListener('scroll', handleScroll);
-  // Run once on page load in case the page is refreshed past 35%
   handleScroll();
 </script>
 <!-- ============ WHAT'S INSIDE CHECKLIST ============ -->

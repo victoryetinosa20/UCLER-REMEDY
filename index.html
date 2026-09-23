@@ -54,6 +54,24 @@ src="https://www.facebook.com/tr?id=1398094341870501&ev=PageView&noscript=1"
             color: #1f5da0;
         }
 
+
+        #sticky-cta {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #1f2937; /* Dark background */
+  padding: 12px;
+  text-align: center;
+  transform: translateY(100%);
+  transition: transform 0.3s ease-in-out;
+  z-index: 9999;
+}
+
+#sticky-cta.show {
+  transform: translateY(0);
+}
+
         /* ---- COSMETIC: Yellow Highlighter ---- */
         .highlight {
             background: linear-gradient(180deg, transparent 55%, #ffe066 55%);
@@ -961,7 +979,7 @@ src="https://www.facebook.com/tr?id=1398094341870501&ev=PageView&noscript=1"
 <section class="font-sans text-gray-800 antialiased w-full flex flex-col items-center bg-white py-14 px-5">
     <div class="max-w-[800px] w-full text-[1.05rem] leading-[1.8] space-y-6">
 
-        <div class="text-[#F37F1B] font-bold items-center justify-center text-center text-2xl md:text-3xl mb-1 py-4">
+        <div id="cta-trigger" class="text-[#F37F1B]  font-bold items-center justify-center text-center text-2xl md:text-3xl mb-1 py-4">
             It's called:
         </div>
 
@@ -1027,7 +1045,54 @@ src="https://www.facebook.com/tr?id=1398094341870501&ev=PageView&noscript=1"
 
     </div>
 </section>
+<div id="sticky-cta">
+  <a href="https://digital-nomads-blog-izhs.vercel.app" class="cta-btn">Check Availability</a>
+</div>
 
+    <script>
+  const triggerSection = document.getElementById("cta-trigger");
+  const stickyCTA = document.getElementById("sticky-cta");
+  let sectionInView = false; // Tracks if the target section is currently visible
+
+  // Observe the target section to hide the CTA when the user reaches it
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          sectionInView = true; // User reached the section
+          stickyCTA.classList.remove("show"); // Hide the CTA
+        } else {
+          sectionInView = false; // User left the section
+        }
+      });
+    },
+    {
+      threshold: 0.2
+    }
+  );
+
+  observer.observe(triggerSection);
+
+  // Check scroll position to show the CTA at 35% of the page
+  function handleScroll() {
+    // Calculate total scrollable distance
+    const scrollDistance = document.documentElement.scrollHeight - window.innerHeight;
+    // Find 35% of that distance
+    const thirtyFivePercent = scrollDistance * 0.35;
+
+    // Show CTA if scrolled past 35% AND the target section is not in view
+    if (window.scrollY > thirtyFivePercent && !sectionInView) {
+      stickyCTA.classList.add("show");
+    } else {
+      stickyCTA.classList.remove("show");
+    }
+  }
+
+  // Add scroll event listener
+  window.addEventListener('scroll', handleScroll);
+  // Run once on page load in case the page is refreshed past 35%
+  handleScroll();
+</script>
 <!-- ============ WHAT'S INSIDE CHECKLIST ============ -->
 <section class="font-sans text-gray-800 antialiased w-full flex flex-col items-center bg-white pb-14 px-5">
     <div class="max-w-[850px] w-full">
